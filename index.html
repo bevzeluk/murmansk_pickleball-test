@@ -1,0 +1,23 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Пиклбол · Счёт матча</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#edf3ee;color:#122a25;font:17px system-ui,sans-serif}main{max-width:460px;margin:28px auto;padding:26px;background:white;border-radius:20px}h1{font-size:32px;margin:12px 0}p{line-height:1.5}small{color:#415f55}form{display:grid;grid-template-columns:1fr 1fr;gap:14px}label{font-weight:600}input{display:block;width:100%;font:700 36px system-ui;text-align:center;padding:12px 0;border:1px solid #9ab6a6;border-radius:10px;margin:6px 0}button{grid-column:span 2;background:#146143;color:white;border:0;border-radius:10px;padding:15px;font:600 17px system-ui}#result{font-weight:600}button:disabled{opacity:.55}
+</style>
+<main><small>СУББОТНИЙ ПИКЛБОЛ</small><h1>Счёт матча</h1><p id="hint"></p>
+<form id="scores"><label>Пара А<input id="left" type="number" min="0" max="99" required inputmode="numeric"></label><label>Пара Б<input id="right" type="number" min="0" max="99" required inputmode="numeric"></label><button id="submit">Проверить счёт</button></form>
+<p id="result" aria-live="polite"></p></main>
+<script>
+const id=new URLSearchParams(location.search).get('id');
+const hint=document.querySelector('#hint'), form=document.querySelector('#scores'), result=document.querySelector('#result'), btn=document.querySelector('#submit');
+hint.textContent=id?'Порядок пар указан в личном сообщении бота.':'Пробный матч · Анна и Борис против Веры и Глеба. Можно проверить форму без Telegram.';
+if(id){const script=document.createElement('script');script.src='https://telegram.org/js/telegram-web-app.js'; script.onload=()=>window.Telegram.WebApp.ready();document.head.append(script)}
+else{form.left.value=11;form.right.value=7}
+let checked=false;
+form.oninput=()=>{checked=false;result.textContent='';btn.textContent='Проверить счёт'};
+form.onsubmit=ev=>{ev.preventDefault();const a=form.left.valueAsNumber,b=form.right.valueAsNumber;
+if(a===b){result.textContent='Для этого формата нужен победитель.';return}
+if(!checked){checked=true;result.textContent='Пара А '+a+' : '+b+' Пара Б. Всё верно?';btn.textContent='Подтвердить';return}
+if(!id){result.textContent='Проверка пройдена. Учебный счёт '+a+' : '+b+'.';return}
+if(!window.Telegram?.WebApp){result.textContent='Откройте форму из личного чата бота.';return}
+window.Telegram.WebApp.sendData(JSON.stringify({id,a,b}));}
+</script></html>
